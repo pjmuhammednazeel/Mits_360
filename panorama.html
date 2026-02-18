@@ -19,6 +19,61 @@
         #panorama {
             width: 100vw;
             height: 100vh;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        #panorama.fade-out {
+            animation: fadeOut 0.4s ease-in-out forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .transition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 999;
+            animation: overlayFade 0.4s ease-in-out;
+        }
+        
+        .transition-overlay.show {
+            display: block;
+        }
+        
+        @keyframes overlayFade {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
         }
         
         .info {
@@ -175,6 +230,8 @@
         <p>⬆️⬇️ Navigate scenes</p>
     </div>
     
+    <div class="transition-overlay" id="transition-overlay"></div>
+    
     <div id="panorama"></div>
     
     <!-- Navigation Arrows -->
@@ -214,7 +271,7 @@
         </svg>
     </div>
     
-    <div class="counter" id="counter">1 / 6</div>
+    <div class="counter" id="counter">1 / 16</div>
     
     <!-- Panellum JavaScript -->
     <script src="https://cdn.pannellum.org/2.5/pannellum.js"></script>
@@ -222,269 +279,29 @@
     <script>
         console.log('Starting Panellum...');
         
-        // Array of panorama scenes
-        const scenes = {
-            'outdoor_1': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_1.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'outdoor_2': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_2.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0,
-                "hotSpots": [
-                    {
-                        "pitch": 0,
-                        "yaw": -90,
-                        "type": "scene",
-                        "text": "Go to Indoor",
-                        "sceneId": "indoor_1",
-                        "targetYaw": 0,
-                        "targetPitch": 0
-                    }
-                ]
-            },
-            'outdoor_3': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_3.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'outdoor_4': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_4.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'outdoor_5': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_5.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0,
-                "hotSpots": [
-                    {
-                        "pitch": 0,
-                        "yaw": 90,
-                        "type": "scene",
-                        "text": "Go to Home",
-                        "sceneId": "home_1",
-                        "targetYaw": 0,
-                        "targetPitch": 0
-                    }
-                ]
-            },
-            'outdoor_6': {
-                "type": "equirectangular",
-                "panorama": "assets/outdoor_6.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'indoor_1': {
-                "type": "equirectangular",
-                "panorama": "assets/indoor_1.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0,
-                "hotSpots": [
-                    {
-                        "pitch": 0,
-                        "yaw": 90,
-                        "type": "scene",
-                        "text": "Back to Outdoor",
-                        "sceneId": "outdoor_2",
-                        "targetYaw": 0,
-                        "targetPitch": 0
-                    }
-                ]
-            },
-            'indoor_2': {
-                "type": "equirectangular",
-                "panorama": "assets/indoor_2.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'indoor_3': {
-                "type": "equirectangular",
-                "panorama": "assets/indoor_3.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'indoor_4': {
-                "type": "equirectangular",
-                "panorama": "assets/indoor_4.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'indoor_5': {
-                "type": "equirectangular",
-                "panorama": "assets/Indoor_5.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'indoor_6': {
-                "type": "equirectangular",
-                "panorama": "assets/indoor_6.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'home_1': {
-                "type": "equirectangular",
-                "panorama": "assets/home_1.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0,
-                "hotSpots": [
-                    {
-                        "pitch": 0,
-                        "yaw": -90,
-                        "type": "scene",
-                        "text": "Back to Outdoor",
-                        "sceneId": "outdoor_5",
-                        "targetYaw": 0,
-                        "targetPitch": 0
-                    }
-                ]
-            },
-            'home_2': {
-                "type": "equirectangular",
-                "panorama": "assets/home_2.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'home_3': {
-                "type": "equirectangular",
-                "panorama": "assets/home_3.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            },
-            'home_4': {
-                "type": "equirectangular",
-                "panorama": "assets/home_4.jpg",
-                "autoLoad": true,
-                "showZoomCtrl": true,
-                "showFullscreenCtrl": true,
-                "mouseZoom": true,
-                "hfov": 120,
-                "minHfov": 60,
-                "maxHfov": 120,
-                "pitch": 0,
-                "yaw": 0
-            }
-        };
+        // Array of panorama scenes for Main Road
+        const scenes = {};
         
-        const outdoorScenes = ['outdoor_1', 'outdoor_2', 'outdoor_3', 'outdoor_4', 'outdoor_5', 'outdoor_6'];
-        const indoorScenes = ['indoor_1', 'indoor_2', 'indoor_3', 'indoor_4', 'indoor_5', 'indoor_6'];
-        const homeScenes = ['home_1', 'home_2', 'home_3', 'home_4'];
+        // Generate scenes for Main Road 1-16
+        for (let i = 1; i <= 16; i++) {
+            scenes[`mainroad_${i}`] = {
+                "type": "equirectangular",
+                "panorama": `assets/Main_Road/Main_Road_${i}.jpg`,
+                "autoLoad": true,
+                "showZoomCtrl": true,
+                "showFullscreenCtrl": true,
+                "mouseZoom": true,
+                "hfov": 120,
+                "minHfov": 60,
+                "maxHfov": 120,
+                "pitch": 0,
+                "yaw": 0
+            };
+        }
+        
+        const mainroadScenes = Array.from({length: 16}, (_, i) => `mainroad_${i + 1}`);
         let currentIndex = 0;
-        let indoorIndex = 0;
-        let homeIndex = 0;
-        let currentScene = 'outdoor_1';
+        let currentScene = 'mainroad_1';
         let viewer;
         
         // Initialize the viewer
@@ -515,69 +332,50 @@
             updateUI();
         }
         
-        // Navigate between panoramas
+        // Navigate between panoramas with Street View-style animation
         function navigatePanorama(direction) {
-            // Check if we're in outdoor or indoor scenes
-            if (outdoorScenes.includes(currentScene)) {
-                const newIndex = currentIndex + direction;
+            const newIndex = currentIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < mainroadScenes.length) {
+                // Start fade out animation
+                const panorama = document.getElementById('panorama');
+                const overlay = document.getElementById('transition-overlay');
                 
-                if (newIndex >= 0 && newIndex < outdoorScenes.length) {
+                panorama.classList.add('fade-out');
+                overlay.classList.add('show');
+                
+                // Wait for animation to complete, then load new scene
+                setTimeout(() => {
                     currentIndex = newIndex;
-                    currentScene = outdoorScenes[currentIndex];
+                    currentScene = mainroadScenes[currentIndex];
                     viewer.loadScene(currentScene);
+                    
+                    // Remove fade-out class and reset
+                    panorama.classList.remove('fade-out');
+                    overlay.classList.remove('show');
                     updateUI();
-                }
-            } else if (indoorScenes.includes(currentScene)) {
-                const newIndex = indoorIndex + direction;
-                
-                if (newIndex >= 0 && newIndex < indoorScenes.length) {
-                    indoorIndex = newIndex;
-                    currentScene = indoorScenes[indoorIndex];
-                    viewer.loadScene(currentScene);
-                    updateUI();
-                }
-            } else if (homeScenes.includes(currentScene)) {
-                const newIndex = homeIndex + direction;
-                
-                if (newIndex >= 0 && newIndex < homeScenes.length) {
-                    homeIndex = newIndex;
-                    currentScene = homeScenes[homeIndex];
-                    viewer.loadScene(currentScene);
-                    updateUI();
-                }
+                }, 400);
             }
         }
         
-        // Go to indoor scene
+        // Go to indoor scene (not applicable for Main Road)
         function goToIndoor() {
-            indoorIndex = 0;
-            currentScene = indoorScenes[indoorIndex];
-            viewer.loadScene(currentScene);
-            updateUI();
+            // Placeholder - not needed for Main Road
         }
         
-        // Go back to outdoor scene
+        // Go back to outdoor scene (not applicable for Main Road)
         function goBackToOutdoor() {
-            currentIndex = 1; // outdoor_2
-            currentScene = outdoorScenes[currentIndex];
-            viewer.loadScene(currentScene);
-            updateUI();
+            // Placeholder - not needed for Main Road
         }
         
-        // Go to home scene
+        // Go to home scene (not applicable for Main Road)
         function goToHome() {
-            homeIndex = 0;
-            currentScene = homeScenes[homeIndex];
-            viewer.loadScene(currentScene);
-            updateUI();
+            // Placeholder - not needed for Main Road
         }
         
-        // Go back to outdoor from home
+        // Go back to outdoor from home (not applicable for Main Road)
         function goBackToOutdoorFromHome() {
-            currentIndex = 4; // outdoor_5
-            currentScene = outdoorScenes[currentIndex];
-            viewer.loadScene(currentScene);
-            updateUI();
+            // Placeholder - not needed for Main Road
         }
         
         // Update UI elements
@@ -590,95 +388,35 @@
             const prevArrow = document.getElementById('prev-arrow');
             const nextArrow = document.getElementById('next-arrow');
             
-            // Hide all special arrows by default
+            // Hide all special arrows
             sideArrow.classList.remove('show');
             backArrow.classList.remove('show');
             homeArrow.classList.remove('show');
             homeBackArrow.classList.remove('show');
             
-            // Show side arrow only when in outdoor_2
-            if (currentScene === 'outdoor_2') {
-                sideArrow.classList.add('show');
+            // Update counter for Main Road scenes
+            currentIndex = mainroadScenes.indexOf(currentScene);
+            counter.textContent = `${currentIndex + 1} / ${mainroadScenes.length}`;
+            counter.style.display = 'block';
+            prevArrow.style.display = 'flex';
+            nextArrow.style.display = 'flex';
+            
+            if (currentIndex === 0) {
+                prevArrow.classList.add('disabled');
+            } else {
+                prevArrow.classList.remove('disabled');
             }
             
-            // Show back arrow only when in indoor_1
-            if (currentScene === 'indoor_1') {
-                backArrow.classList.add('show');
-            }
-            
-            // Show home arrow only when in outdoor_5
-            if (currentScene === 'outdoor_5') {
-                homeArrow.classList.add('show');
-            }
-            
-            // Show home back arrow only when in home_1
-            if (currentScene === 'home_1') {
-                homeBackArrow.classList.add('show');
-            }
-            
-            // Update counter and arrows for outdoor scenes
-            if (outdoorScenes.includes(currentScene)) {
-                currentIndex = outdoorScenes.indexOf(currentScene);
-                counter.textContent = `${currentIndex + 1} / ${outdoorScenes.length}`;
-                counter.style.display = 'block';
-                prevArrow.style.display = 'flex';
-                nextArrow.style.display = 'flex';
-                
-                if (currentIndex === 0) {
-                    prevArrow.classList.add('disabled');
-                } else {
-                    prevArrow.classList.remove('disabled');
-                }
-                
-                if (currentIndex === outdoorScenes.length - 1) {
-                    nextArrow.classList.add('disabled');
-                } else {
-                    nextArrow.classList.remove('disabled');
-                }
-            } else if (indoorScenes.includes(currentScene)) {
-                // In indoor scenes
-                indoorIndex = indoorScenes.indexOf(currentScene);
-                counter.textContent = `Indoor ${indoorIndex + 1} / ${indoorScenes.length}`;
-                counter.style.display = 'block';
-                prevArrow.style.display = 'flex';
-                nextArrow.style.display = 'flex';
-                
-                if (indoorIndex === 0) {
-                    prevArrow.classList.add('disabled');
-                } else {
-                    prevArrow.classList.remove('disabled');
-                }
-                
-                if (indoorIndex === indoorScenes.length - 1) {
-                    nextArrow.classList.add('disabled');
-                } else {
-                    nextArrow.classList.remove('disabled');
-                }
-            } else if (homeScenes.includes(currentScene)) {
-                // In home scenes
-                homeIndex = homeScenes.indexOf(currentScene);
-                counter.textContent = `Home ${homeIndex + 1} / ${homeScenes.length}`;
-                counter.style.display = 'block';
-                prevArrow.style.display = 'flex';
-                nextArrow.style.display = 'flex';
-                
-                if (homeIndex === 0) {
-                    prevArrow.classList.add('disabled');
-                } else {
-                    prevArrow.classList.remove('disabled');
-                }
-                
-                if (homeIndex === homeScenes.length - 1) {
-                    nextArrow.classList.add('disabled');
-                } else {
-                    nextArrow.classList.remove('disabled');
-                }
+            if (currentIndex === mainroadScenes.length - 1) {
+                nextArrow.classList.add('disabled');
+            } else {
+                nextArrow.classList.remove('disabled');
             }
         }
         
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {
-            if (outdoorScenes.includes(currentScene) || indoorScenes.includes(currentScene) || homeScenes.includes(currentScene)) {
+            if (mainroadScenes.includes(currentScene)) {
                 if (e.key === 'ArrowDown') {
                     navigatePanorama(-1);
                 } else if (e.key === 'ArrowUp') {
@@ -688,7 +426,7 @@
         });
         
         // Initialize with first panorama
-        initViewer('outdoor_1');
+        initViewer('mainroad_1');
     </script>
 </body>
 </html>
