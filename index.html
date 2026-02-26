@@ -133,10 +133,12 @@
         
         #prev-arrow {
             bottom: 30px;
+            display: flex !important;
         }
         
         #next-arrow {
             bottom: 100px;
+            display: flex !important;
         }
         
         #side-arrow {
@@ -156,17 +158,29 @@
         }
         
         #back-arrow {
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
+            display: none !important;
+        }
+        
+        #mainroad-button {
+            position: fixed !important;
+            right: 10px !important;
+            bottom: 10px !important;
+            left: auto !important;
+            transform: none !important;
             display: none;
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
         }
         
-        #back-arrow:hover {
-            transform: translateX(-50%) scale(1.1);
+        #mainroad-button:hover {
+            transform: scale(1.1);
         }
         
-        #back-arrow.show {
+        #mainroad-button.show {
             display: flex;
         }
         
@@ -199,6 +213,21 @@
         
         #home-back-arrow.show {
             display: flex;
+        }
+        
+        #left-arrow {
+            left: 30px;
+            bottom: 50%;
+            transform: translateY(50%);
+            display: none;
+        }
+        
+        #left-arrow.show {
+            display: flex;
+        }
+        
+        #left-arrow:hover {
+            transform: translateY(50%) scale(1.1);
         }
         
         .nav-arrow svg {
@@ -235,13 +264,13 @@
     <div id="panorama"></div>
     
     <!-- Navigation Arrows -->
-    <div id="prev-arrow" class="nav-arrow" onclick="navigatePanorama(-1)">
+    <div id="prev-arrow" class="nav-arrow">
         <svg viewBox="0 0 24 24">
             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
         </svg>
     </div>
     
-    <div id="next-arrow" class="nav-arrow" onclick="navigatePanorama(1)">
+    <div id="next-arrow" class="nav-arrow">
         <svg viewBox="0 0 24 24">
             <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
         </svg>
@@ -253,10 +282,12 @@
         </svg>
     </div>
     
-    <div id="back-arrow" class="nav-arrow" onclick="goBackToOutdoor()">
-        <svg viewBox="0 0 24 24">
-            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
-        </svg>
+    <div id="back-arrow" class="nav-arrow back-button" onclick="handleBackArrow()">
+        <span style="font-size: 16px; font-weight: bold; color: #333;">Back</span>
+    </div>
+    
+    <div id="mainroad-button" class="nav-arrow" onclick="handleMainRoadButton()">
+        <span style="font-size: 10px; font-weight: bold; color: #333; text-align: center; white-space: normal; line-height: 1.2;">Back</span>
     </div>
     
     <div id="home-arrow" class="nav-arrow" onclick="goToHome()">
@@ -266,6 +297,12 @@
     </div>
     
     <div id="home-back-arrow" class="nav-arrow" onclick="goBackToOutdoorFromHome()">
+        <svg viewBox="0 0 24 24">
+            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+        </svg>
+    </div>
+    
+    <div id="left-arrow" class="nav-arrow" onclick="handleLeftArrow()">
         <svg viewBox="0 0 24 24">
             <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
         </svg>
@@ -299,9 +336,48 @@
             };
         }
         
+        // Generate scenes for BSchool 1-5 and Step_1
+        const bschoolImages = ['BSchool_1', 'BSchool_2', 'BSchool_3', 'BSchool_4', 'BSchool_5', 'Step_1', 'BSchool_1.1', 'Step_2', 'BSchool_2.1', 'BSchool_2.2', 'BSchool_2.3', 'BSchool_2.4', 'BSchool_2.5', 'BSchool_2.6'];
+        for (let i = 0; i < bschoolImages.length; i++) {
+            scenes[`bschool_${i + 1}`] = {
+                "type": "equirectangular",
+                "panorama": `assets/BSchool/${bschoolImages[i]}.jpg`,
+                "autoLoad": true,
+                "showZoomCtrl": true,
+                "showFullscreenCtrl": true,
+                "mouseZoom": true,
+                "hfov": 120,
+                "minHfov": 60,
+                "maxHfov": 120,
+                "pitch": 0,
+                "yaw": 0
+            };
+        }
+        
+        // Generate scenes for BSchool_1.2 to 1.4 (sub-collection)
+        const bschool1SubImages = ['BSchool_1.2', 'BSchool_1.3', 'BSchool_1.4'];
+        for (let i = 0; i < bschool1SubImages.length; i++) {
+            scenes[`bschool1sub_${i + 1}`] = {
+                "type": "equirectangular",
+                "panorama": `assets/BSchool/${bschool1SubImages[i]}.jpg`,
+                "autoLoad": true,
+                "showZoomCtrl": true,
+                "showFullscreenCtrl": true,
+                "mouseZoom": true,
+                "hfov": 120,
+                "minHfov": 60,
+                "maxHfov": 120,
+                "pitch": 0,
+                "yaw": 0
+            };
+        }
+        
         const mainroadScenes = Array.from({length: 16}, (_, i) => `mainroad_${i + 1}`);
+        const bschoolScenes = Array.from({length: 14}, (_, i) => `bschool_${i + 1}`);
+        const bschool1SubScenes = Array.from({length: 3}, (_, i) => `bschool1sub_${i + 1}`);
         let currentIndex = 0;
         let currentScene = 'mainroad_1';
+        let currentCollection = 'mainroad'; // Track which collection we're in
         let viewer;
         
         // Initialize the viewer
@@ -332,11 +408,26 @@
             updateUI();
         }
         
+        let isNavigating = false; // Flag to prevent multiple clicks during animation
+        
         // Navigate between panoramas with Street View-style animation
         function navigatePanorama(direction) {
+            if (isNavigating) return; // Prevent multiple clicks during animation
+            
+            let currentSceneArray;
+            if (currentCollection === 'mainroad') {
+                currentSceneArray = mainroadScenes;
+            } else if (currentCollection === 'bschool') {
+                currentSceneArray = bschoolScenes;
+            } else if (currentCollection === 'bschool1_sub') {
+                currentSceneArray = bschool1SubScenes;
+            }
+            
             const newIndex = currentIndex + direction;
             
-            if (newIndex >= 0 && newIndex < mainroadScenes.length) {
+            if (newIndex >= 0 && newIndex < currentSceneArray.length) {
+                isNavigating = true; // Set flag to prevent other clicks
+                
                 // Start fade out animation
                 const panorama = document.getElementById('panorama');
                 const overlay = document.getElementById('transition-overlay');
@@ -347,13 +438,15 @@
                 // Wait for animation to complete, then load new scene
                 setTimeout(() => {
                     currentIndex = newIndex;
-                    currentScene = mainroadScenes[currentIndex];
+                    currentScene = currentSceneArray[currentIndex];
                     viewer.loadScene(currentScene);
                     
                     // Remove fade-out class and reset
                     panorama.classList.remove('fade-out');
                     overlay.classList.remove('show');
                     updateUI();
+                    
+                    isNavigating = false; // Allow navigation again
                 }, 400);
             }
         }
@@ -378,12 +471,121 @@
             // Placeholder - not needed for Main Road
         }
         
+        // Navigate to BSchool from Main Road 5
+        function goToBSchool() {
+            const panorama = document.getElementById('panorama');
+            const overlay = document.getElementById('transition-overlay');
+            
+            panorama.classList.add('fade-out');
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                currentCollection = 'bschool';
+                currentIndex = 0;
+                currentScene = bschoolScenes[0];
+                viewer.loadScene(currentScene);
+                
+                panorama.classList.remove('fade-out');
+                overlay.classList.remove('show');
+                updateUI();
+            }, 400);
+        }
+        
+        // Navigate back from BSchool to Main Road 5
+        function goBackFromBSchool() {
+            const panorama = document.getElementById('panorama');
+            const overlay = document.getElementById('transition-overlay');
+            
+            panorama.classList.add('fade-out');
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                currentCollection = 'mainroad';
+                currentIndex = 4; // Main Road 5 is at index 4
+                currentScene = mainroadScenes[4];
+                viewer.loadScene(currentScene);
+                
+                panorama.classList.remove('fade-out');
+                overlay.classList.remove('show');
+                updateUI();
+            }, 400);
+        }
+        
+        // Handle back arrow - route to appropriate function
+        function handleBackArrow() {
+            if (currentCollection === 'bschool') {
+                goBackFromBSchool();
+            } else {
+                goBackToOutdoor();
+            }
+        }
+        
+        // Navigate to BSchool 1 sub-collection from BSchool_1.1
+        function goToBSchool1Sub() {
+            const panorama = document.getElementById('panorama');
+            const overlay = document.getElementById('transition-overlay');
+            
+            panorama.classList.add('fade-out');
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                currentCollection = 'bschool1_sub';
+                currentIndex = 0;
+                currentScene = bschool1SubScenes[0];
+                viewer.loadScene(currentScene);
+                
+                panorama.classList.remove('fade-out');
+                overlay.classList.remove('show');
+                updateUI();
+            }, 400);
+        }
+        
+        // Navigate back from BSchool 1 sub-collection to BSchool_1.1
+        function goBackFromBSchool1Sub() {
+            const panorama = document.getElementById('panorama');
+            const overlay = document.getElementById('transition-overlay');
+            
+            panorama.classList.add('fade-out');
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                currentCollection = 'bschool';
+                currentIndex = 6; // BSchool_1.1 is at index 6
+                currentScene = bschoolScenes[6];
+                viewer.loadScene(currentScene);
+                
+                panorama.classList.remove('fade-out');
+                overlay.classList.remove('show');
+                updateUI();
+            }, 400);
+        }
+        
+        // Handle Main Road button - route to appropriate function
+        function handleMainRoadButton() {
+            if (currentCollection === 'bschool') {
+                goBackFromBSchool();
+            } else if (currentCollection === 'bschool1_sub') {
+                goBackFromBSchool1Sub();
+            }
+        }
+        
+        // Handle left arrow - route to appropriate function
+        function handleLeftArrow() {
+            if (currentCollection === 'mainroad' && currentIndex === 4) {
+                goToBSchool();
+            } else if (currentCollection === 'bschool' && currentIndex === 6) {
+                goToBSchool1Sub();
+            }
+        }
+        
         // Update UI elements
         function updateUI() {
             const sideArrow = document.getElementById('side-arrow');
             const backArrow = document.getElementById('back-arrow');
             const homeArrow = document.getElementById('home-arrow');
             const homeBackArrow = document.getElementById('home-back-arrow');
+            const leftArrow = document.getElementById('left-arrow');
+            const mainroadButton = document.getElementById('mainroad-button');
             const counter = document.getElementById('counter');
             const prevArrow = document.getElementById('prev-arrow');
             const nextArrow = document.getElementById('next-arrow');
@@ -393,30 +595,88 @@
             backArrow.classList.remove('show');
             homeArrow.classList.remove('show');
             homeBackArrow.classList.remove('show');
+            leftArrow.classList.remove('show');
+            mainroadButton.classList.remove('show');
             
-            // Update counter for Main Road scenes
-            currentIndex = mainroadScenes.indexOf(currentScene);
-            counter.textContent = `${currentIndex + 1} / ${mainroadScenes.length}`;
-            counter.style.display = 'block';
-            prevArrow.style.display = 'flex';
-            nextArrow.style.display = 'flex';
-            
-            if (currentIndex === 0) {
-                prevArrow.classList.add('disabled');
-            } else {
-                prevArrow.classList.remove('disabled');
-            }
-            
-            if (currentIndex === mainroadScenes.length - 1) {
-                nextArrow.classList.add('disabled');
-            } else {
-                nextArrow.classList.remove('disabled');
+            if (currentCollection === 'mainroad') {
+                // Update counter for Main Road scenes
+                currentIndex = mainroadScenes.indexOf(currentScene);
+                counter.textContent = `${currentIndex + 1} / ${mainroadScenes.length}`;
+                counter.style.display = 'block';
+                prevArrow.style.display = 'flex';
+                nextArrow.style.display = 'flex';
+                
+                if (currentIndex === 0) {
+                    prevArrow.classList.add('disabled');
+                } else {
+                    prevArrow.classList.remove('disabled');
+                }
+                
+                if (currentIndex === mainroadScenes.length - 1) {
+                    nextArrow.classList.add('disabled');
+                } else {
+                    nextArrow.classList.remove('disabled');
+                }
+                
+                // Show left arrow only on Main Road 5 (index 4)
+                if (currentIndex === 4) {
+                    leftArrow.classList.add('show');
+                }
+            } else if (currentCollection === 'bschool') {
+                // Update counter for BSchool scenes
+                currentIndex = bschoolScenes.indexOf(currentScene);
+                counter.textContent = `${currentIndex + 1} / ${bschoolScenes.length}`;
+                counter.style.display = 'block';
+                prevArrow.style.display = 'flex';
+                nextArrow.style.display = 'flex';
+                
+                if (currentIndex === 0) {
+                    prevArrow.classList.add('disabled');
+                } else {
+                    prevArrow.classList.remove('disabled');
+                }
+                
+                if (currentIndex === bschoolScenes.length - 1) {
+                    nextArrow.classList.add('disabled');
+                } else {
+                    nextArrow.classList.remove('disabled');
+                }
+                
+                // Show Main Road button to return to Main Road 5
+                mainroadButton.classList.add('show');
+                
+                // Show left arrow on BSchool_1.1 (index 6)
+                if (currentIndex === 6) {
+                    leftArrow.classList.add('show');
+                }
+            } else if (currentCollection === 'bschool1_sub') {
+                // Update counter for BSchool 1 sub scenes
+                currentIndex = bschool1SubScenes.indexOf(currentScene);
+                counter.textContent = `${currentIndex + 1} / ${bschool1SubScenes.length}`;
+                counter.style.display = 'block';
+                prevArrow.style.display = 'flex';
+                nextArrow.style.display = 'flex';
+                
+                if (currentIndex === 0) {
+                    prevArrow.classList.add('disabled');
+                } else {
+                    prevArrow.classList.remove('disabled');
+                }
+                
+                if (currentIndex === bschool1SubScenes.length - 1) {
+                    nextArrow.classList.add('disabled');
+                } else {
+                    nextArrow.classList.remove('disabled');
+                }
+                
+                // Show Main Road button to return to BSchool_1.1
+                mainroadButton.classList.add('show');
             }
         }
         
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {
-            if (mainroadScenes.includes(currentScene)) {
+            if (currentCollection === 'mainroad' || currentCollection === 'bschool' || currentCollection === 'bschool1_sub') {
                 if (e.key === 'ArrowDown') {
                     navigatePanorama(-1);
                 } else if (e.key === 'ArrowUp') {
@@ -427,6 +687,21 @@
         
         // Initialize with first panorama
         initViewer('mainroad_1');
+        
+        // Add event listeners for navigation arrows
+        document.getElementById('prev-arrow').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!this.classList.contains('disabled')) {
+                navigatePanorama(-1);
+            }
+        });
+        
+        document.getElementById('next-arrow').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!this.classList.contains('disabled')) {
+                navigatePanorama(1);
+            }
+        });
     </script>
 </body>
 </html>
