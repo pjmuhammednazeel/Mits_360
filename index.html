@@ -1,13 +1,15 @@
-W<!DOCTYPE html>
+W
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>360° Panoramic View</title>
-    
+
     <!-- Panellum CSS -->
-    <link rel="stylesheet" href="https://cdn.pannellum.org/2.5/pannellum.css"/>
-    
+    <link rel="stylesheet" href="https://cdn.pannellum.org/2.5/pannellum.css" />
+
     <style>
         body {
             margin: 0;
@@ -15,39 +17,41 @@ W<!DOCTYPE html>
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
-        
+
         #panorama {
             width: 100vw;
             height: 100vh;
             animation: fadeIn 0.6s ease-in-out;
         }
-        
+
         #panorama.fade-out {
             animation: fadeOut 0.4s ease-in-out forwards;
         }
-        
+
         @keyframes fadeOut {
             0% {
                 opacity: 1;
                 transform: scale(1);
             }
+
             100% {
                 opacity: 0;
                 transform: scale(1.05);
             }
         }
-        
+
         @keyframes fadeIn {
             0% {
                 opacity: 0;
                 transform: scale(0.95);
             }
+
             100% {
                 opacity: 1;
                 transform: scale(1);
             }
         }
-        
+
         .transition-overlay {
             position: absolute;
             top: 0;
@@ -59,23 +63,25 @@ W<!DOCTYPE html>
             z-index: 999;
             animation: overlayFade 0.4s ease-in-out;
         }
-        
+
         .transition-overlay.show {
             display: block;
         }
-        
+
         @keyframes overlayFade {
             0% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 1;
             }
+
             100% {
                 opacity: 0;
             }
         }
-        
+
         .info {
             position: absolute;
             top: 20px;
@@ -87,18 +93,18 @@ W<!DOCTYPE html>
             z-index: 1000;
             font-size: 14px;
         }
-        
+
         .info h2 {
             margin: 0 0 10px 0;
             font-size: 18px;
         }
-        
+
         .info p {
             margin: 5px 0;
             font-size: 12px;
             opacity: 0.9;
         }
-        
+
         .nav-arrow {
             position: absolute;
             left: 50%;
@@ -115,32 +121,32 @@ W<!DOCTYPE html>
             transition: all 0.3s ease;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
-        
+
         .nav-arrow:hover {
             background: rgba(255, 255, 255, 1);
             transform: translateX(-50%) scale(1.1);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
-        
+
         .nav-arrow.disabled {
             opacity: 0.3;
             cursor: not-allowed;
         }
-        
+
         .nav-arrow.disabled:hover {
             transform: translateX(-50%) scale(1);
         }
-        
+
         #prev-arrow {
             bottom: 30px;
             display: flex !important;
         }
-        
+
         #next-arrow {
             bottom: 100px;
             display: flex !important;
         }
-        
+
         #side-arrow {
             left: 50%;
             bottom: 100px;
@@ -148,19 +154,19 @@ W<!DOCTYPE html>
             display: none;
             margin-left: -80px;
         }
-        
+
         #side-arrow:hover {
             transform: translateX(-50%) scale(1.1);
         }
-        
+
         #side-arrow.show {
             display: flex;
         }
-        
+
         #back-arrow {
             display: none !important;
         }
-        
+
         #mainroad-button {
             position: fixed !important;
             right: 10px !important;
@@ -175,15 +181,15 @@ W<!DOCTYPE html>
             font-size: 12px;
             font-weight: bold;
         }
-        
+
         #mainroad-button:hover {
             transform: scale(1.1);
         }
-        
+
         #mainroad-button.show {
             display: flex;
         }
-        
+
         #home-arrow {
             left: 50%;
             bottom: 100px;
@@ -191,45 +197,45 @@ W<!DOCTYPE html>
             display: none;
             margin-left: 80px;
         }
-        
+
         #home-arrow:hover {
             transform: translateX(-50%) scale(1.1);
         }
-        
+
         #home-arrow.show {
             display: flex;
         }
-        
+
         #home-back-arrow {
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
             display: none;
         }
-        
+
         #home-back-arrow:hover {
             transform: translateX(-50%) scale(1.1);
         }
-        
+
         #home-back-arrow.show {
             display: flex;
         }
-        
+
         #left-arrow {
             left: 30px;
             bottom: 50%;
             transform: translateY(50%);
             display: none;
         }
-        
+
         #left-arrow.show {
             display: flex;
         }
-        
+
         #left-arrow:hover {
             transform: translateY(50%) scale(1.1);
         }
-        
+
         #right-arrow {
             right: 30px;
             left: auto;
@@ -237,21 +243,21 @@ W<!DOCTYPE html>
             transform: translateY(50%);
             display: none;
         }
-        
+
         #right-arrow.show {
             display: flex;
         }
-        
+
         #right-arrow:hover {
             transform: translateY(50%) scale(1.1);
         }
-        
+
         .nav-arrow svg {
             width: 30px;
             height: 30px;
             fill: #333;
         }
-        
+
         .counter {
             position: absolute;
             bottom: 200px;
@@ -267,6 +273,7 @@ W<!DOCTYPE html>
         }
     </style>
 </head>
+
 <body>
     <div class="info">
         <h2>360° Panoramic View</h2>
@@ -274,73 +281,74 @@ W<!DOCTYPE html>
         <p>🔍 Scroll to zoom</p>
         <p>⬆️⬇️ Navigate scenes</p>
     </div>
-    
+
     <div class="transition-overlay" id="transition-overlay"></div>
-    
+
     <div id="panorama"></div>
-    
+
     <!-- Navigation Arrows -->
     <div id="prev-arrow" class="nav-arrow">
         <svg viewBox="0 0 24 24">
-            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div id="next-arrow" class="nav-arrow">
         <svg viewBox="0 0 24 24">
-            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
         </svg>
     </div>
-    
+
     <div id="side-arrow" class="nav-arrow" onclick="goToIndoor()">
         <svg viewBox="0 0 24 24">
-            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div id="back-arrow" class="nav-arrow back-button" onclick="handleBackArrow()">
         <span style="font-size: 16px; font-weight: bold; color: #333;">Back</span>
     </div>
-    
+
     <div id="mainroad-button" class="nav-arrow" onclick="handleMainRoadButton()">
-        <span style="font-size: 10px; font-weight: bold; color: #333; text-align: center; white-space: normal; line-height: 1.2;">Back</span>
+        <span
+            style="font-size: 10px; font-weight: bold; color: #333; text-align: center; white-space: normal; line-height: 1.2;">Back</span>
     </div>
-    
+
     <div id="home-arrow" class="nav-arrow" onclick="goToHome()">
         <svg viewBox="0 0 24 24">
-            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div id="home-back-arrow" class="nav-arrow" onclick="goBackToOutdoorFromHome()">
         <svg viewBox="0 0 24 24">
-            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div id="left-arrow" class="nav-arrow" onclick="handleLeftArrow()">
         <svg viewBox="0 0 24 24">
-            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div id="right-arrow" class="nav-arrow" onclick="handleRightArrow()">
         <svg viewBox="0 0 24 24">
-            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
         </svg>
     </div>
-    
+
     <div class="counter" id="counter">1 / 16</div>
-    
+
     <!-- Panellum JavaScript -->
     <script src="https://cdn.pannellum.org/2.5/pannellum.js"></script>
-    
+
     <script>
         console.log('Starting Panellum...');
-        
+
         // Array of panorama scenes for Main Road
         const scenes = {};
-        
+
         // Generate scenes for Main Road 1-16
         for (let i = 1; i <= 16; i++) {
             scenes[`mainroad_${i}`] = {
@@ -357,7 +365,7 @@ W<!DOCTYPE html>
                 "yaw": 0
             };
         }
-        
+
         // Generate scenes for BSchool 1-5 and Step_1
         const bschoolImages = ['BSchool_1', 'BSchool_2', 'BSchool_3', 'BSchool_4', 'BSchool_5', 'Step_1', 'BSchool_1.1', 'Step_2', 'BSchool_2.1', 'BSchool_2.2', 'BSchool_2.3', 'BSchool_2.4', 'BSchool_2.5', 'BSchool_2.6'];
         for (let i = 0; i < bschoolImages.length; i++) {
@@ -375,7 +383,7 @@ W<!DOCTYPE html>
                 "yaw": 0
             };
         }
-        
+
         // Generate scenes for BSchool_1.2 to 1.4 (sub-collection)
         const bschool1SubImages = ['BSchool_1.2', 'BSchool_1.3', 'BSchool_1.4'];
         for (let i = 0; i < bschool1SubImages.length; i++) {
@@ -393,9 +401,19 @@ W<!DOCTYPE html>
                 "yaw": 0
             };
         }
-        
-        // Generate scenes for MGeorge 1.1 to 1.20
-        const mgeorgeImageNames = ['1.1','1.2','1.3','1.4','1.5','1.6','1.7','1.8','1.9','1.10','1.11','1.12','1.13','1.14','1.15','1.16','1.17','1.18','1.19','1.20'];
+
+        // Generate scenes for MGeorge 1.1 to 1.82
+        const mgeorgeImageNames = [
+            '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '1.10',
+            '1.11', '1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20',
+            '1.21', '1.22', '1.23', '1.24', '1.25', '1.26', '1.27', '1.28', '1.29', '1.30',
+            '1.31', '1.32', '1.33', '1.34', '1.35', '1.36', '1.37', '1.38', '1.39', '1.40',
+            '1.41', '1.42', '1.43', '1.44', '1.45', '1.46', '1.47', '1.48', '1.49', '1.50',
+            '1.51', '1.52', '1.53', '1.54', '1.55', '1.56', '1.57', '1.58', '1..59', '1.60',
+            '1.61', '1.62', '1.63', '1.64', '1.65', '1.66', '1.67', '1.68', '1.69', '1.70',
+            '1.71', '1.72', '1.73', '1.74', '1.75', '1.76', '1.77', '1.78', '1.79', '1.80',
+            '1.81', '1.82'
+        ];
         for (let i = 0; i < mgeorgeImageNames.length; i++) {
             scenes[`mgeorge_${i + 1}`] = {
                 "type": "equirectangular",
@@ -411,50 +429,50 @@ W<!DOCTYPE html>
                 "yaw": 0
             };
         }
-        
-        const mainroadScenes = Array.from({length: 16}, (_, i) => `mainroad_${i + 1}`);
-        const bschoolScenes = Array.from({length: 14}, (_, i) => `bschool_${i + 1}`);
-        const bschool1SubScenes = Array.from({length: 3}, (_, i) => `bschool1sub_${i + 1}`);
-        const mgeorgeScenes = Array.from({length: 20}, (_, i) => `mgeorge_${i + 1}`);
+
+        const mainroadScenes = Array.from({ length: 16 }, (_, i) => `mainroad_${i + 1}`);
+        const bschoolScenes = Array.from({ length: 14 }, (_, i) => `bschool_${i + 1}`);
+        const bschool1SubScenes = Array.from({ length: 3 }, (_, i) => `bschool1sub_${i + 1}`);
+        const mgeorgeScenes = Array.from({ length: 82 }, (_, i) => `mgeorge_${i + 1}`);
         let currentIndex = 0;
         let currentScene = 'mainroad_1';
         let currentCollection = 'mainroad'; // Track which collection we're in
         let viewer;
-        
+
         // Initialize the viewer
         function initViewer(sceneId) {
             if (viewer) {
                 viewer.destroy();
             }
-            
+
             const config = {
                 "default": {
                     "firstScene": sceneId
                 },
                 "scenes": scenes
             };
-            
+
             viewer = pannellum.viewer('panorama', config);
-            
-            viewer.on('error', function(err) {
+
+            viewer.on('error', function (err) {
                 console.error('Panellum error:', err);
                 alert('Error loading panorama: ' + err);
             });
-            
-            viewer.on('load', function() {
+
+            viewer.on('load', function () {
                 console.log('Panorama loaded successfully!');
             });
-            
+
             currentScene = sceneId;
             updateUI();
         }
-        
+
         let isNavigating = false; // Flag to prevent multiple clicks during animation
-        
+
         // Navigate between panoramas with Street View-style animation
         function navigatePanorama(direction) {
             if (isNavigating) return; // Prevent multiple clicks during animation
-            
+
             let currentSceneArray;
             if (currentCollection === 'mainroad') {
                 currentSceneArray = mainroadScenes;
@@ -465,95 +483,95 @@ W<!DOCTYPE html>
             } else if (currentCollection === 'mgeorge') {
                 currentSceneArray = mgeorgeScenes;
             }
-            
+
             const newIndex = currentIndex + direction;
-            
+
             if (newIndex >= 0 && newIndex < currentSceneArray.length) {
                 isNavigating = true; // Set flag to prevent other clicks
-                
+
                 // Start fade out animation
                 const panorama = document.getElementById('panorama');
                 const overlay = document.getElementById('transition-overlay');
-                
+
                 panorama.classList.add('fade-out');
                 overlay.classList.add('show');
-                
+
                 // Wait for animation to complete, then load new scene
                 setTimeout(() => {
                     currentIndex = newIndex;
                     currentScene = currentSceneArray[currentIndex];
                     viewer.loadScene(currentScene);
-                    
+
                     // Remove fade-out class and reset
                     panorama.classList.remove('fade-out');
                     overlay.classList.remove('show');
                     updateUI();
-                    
+
                     isNavigating = false; // Allow navigation again
                 }, 400);
             }
         }
-        
+
         // Go to indoor scene (not applicable for Main Road)
         function goToIndoor() {
             // Placeholder - not needed for Main Road
         }
-        
+
         // Go back to outdoor scene (not applicable for Main Road)
         function goBackToOutdoor() {
             // Placeholder - not needed for Main Road
         }
-        
+
         // Go to home scene (not applicable for Main Road)
         function goToHome() {
             // Placeholder - not needed for Main Road
         }
-        
+
         // Go back to outdoor from home (not applicable for Main Road)
         function goBackToOutdoorFromHome() {
             // Placeholder - not needed for Main Road
         }
-        
+
         // Navigate to BSchool from Main Road 5
         function goToBSchool() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'bschool';
                 currentIndex = 0;
                 currentScene = bschoolScenes[0];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Navigate back from BSchool to Main Road 5
         function goBackFromBSchool() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'mainroad';
                 currentIndex = 4; // Main Road 5 is at index 4
                 currentScene = mainroadScenes[4];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Handle back arrow - route to appropriate function
         function handleBackArrow() {
             if (currentCollection === 'bschool') {
@@ -562,87 +580,87 @@ W<!DOCTYPE html>
                 goBackToOutdoor();
             }
         }
-        
+
         // Navigate to BSchool 1 sub-collection from BSchool_1.1
         function goToBSchool1Sub() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'bschool1_sub';
                 currentIndex = 0;
                 currentScene = bschool1SubScenes[0];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Navigate back from BSchool 1 sub-collection to BSchool_1.1
         function goBackFromBSchool1Sub() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'bschool';
                 currentIndex = 6; // BSchool_1.1 is at index 6
                 currentScene = bschoolScenes[6];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Navigate to MGeorge from Main Road 7
         function goToMGeorge() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'mgeorge';
                 currentIndex = 0;
                 currentScene = mgeorgeScenes[0];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Navigate back from MGeorge to Main Road 7
         function goBackFromMGeorge() {
             const panorama = document.getElementById('panorama');
             const overlay = document.getElementById('transition-overlay');
-            
+
             panorama.classList.add('fade-out');
             overlay.classList.add('show');
-            
+
             setTimeout(() => {
                 currentCollection = 'mainroad';
                 currentIndex = 6; // Main Road 7 is at index 6
                 currentScene = mainroadScenes[6];
                 viewer.loadScene(currentScene);
-                
+
                 panorama.classList.remove('fade-out');
                 overlay.classList.remove('show');
                 updateUI();
             }, 400);
         }
-        
+
         // Handle Main Road button - route to appropriate function
         function handleMainRoadButton() {
             if (currentCollection === 'bschool') {
@@ -653,7 +671,7 @@ W<!DOCTYPE html>
                 goBackFromMGeorge();
             }
         }
-        
+
         // Handle left arrow - route to appropriate function
         function handleLeftArrow() {
             if (currentCollection === 'mainroad' && currentIndex === 4) {
@@ -662,14 +680,14 @@ W<!DOCTYPE html>
                 goToBSchool1Sub();
             }
         }
-        
+
         // Handle right arrow - route to appropriate function
         function handleRightArrow() {
             if (currentCollection === 'mainroad' && currentIndex === 6) {
                 goToMGeorge();
             }
         }
-        
+
         // Update UI elements
         function updateUI() {
             const sideArrow = document.getElementById('side-arrow');
@@ -682,7 +700,7 @@ W<!DOCTYPE html>
             const counter = document.getElementById('counter');
             const prevArrow = document.getElementById('prev-arrow');
             const nextArrow = document.getElementById('next-arrow');
-            
+
             // Hide all special arrows
             sideArrow.classList.remove('show');
             backArrow.classList.remove('show');
@@ -691,17 +709,17 @@ W<!DOCTYPE html>
             leftArrow.classList.remove('show');
             rightArrow.classList.remove('show');
             mainroadButton.classList.remove('show');
-            
+
             if (currentCollection === 'mainroad') {
                 currentIndex = mainroadScenes.indexOf(currentScene);
                 counter.textContent = `${currentIndex + 1} / ${mainroadScenes.length}`;
                 counter.style.display = 'block';
                 prevArrow.style.display = 'flex';
                 nextArrow.style.display = 'flex';
-                
+
                 prevArrow.classList.toggle('disabled', currentIndex === 0);
                 nextArrow.classList.toggle('disabled', currentIndex === mainroadScenes.length - 1);
-                
+
                 // Left arrow at Main Road 5 (index 4) → BSchool
                 if (currentIndex === 4) {
                     leftArrow.classList.add('show');
@@ -716,12 +734,12 @@ W<!DOCTYPE html>
                 counter.style.display = 'block';
                 prevArrow.style.display = 'flex';
                 nextArrow.style.display = 'flex';
-                
+
                 prevArrow.classList.toggle('disabled', currentIndex === 0);
                 nextArrow.classList.toggle('disabled', currentIndex === bschoolScenes.length - 1);
-                
+
                 mainroadButton.classList.add('show');
-                
+
                 // Left arrow on BSchool_1.1 (index 6)
                 if (currentIndex === 6) {
                     leftArrow.classList.add('show');
@@ -732,10 +750,10 @@ W<!DOCTYPE html>
                 counter.style.display = 'block';
                 prevArrow.style.display = 'flex';
                 nextArrow.style.display = 'flex';
-                
+
                 prevArrow.classList.toggle('disabled', currentIndex === 0);
                 nextArrow.classList.toggle('disabled', currentIndex === bschool1SubScenes.length - 1);
-                
+
                 mainroadButton.classList.add('show');
             } else if (currentCollection === 'mgeorge') {
                 currentIndex = mgeorgeScenes.indexOf(currentScene);
@@ -743,17 +761,17 @@ W<!DOCTYPE html>
                 counter.style.display = 'block';
                 prevArrow.style.display = 'flex';
                 nextArrow.style.display = 'flex';
-                
+
                 prevArrow.classList.toggle('disabled', currentIndex === 0);
                 nextArrow.classList.toggle('disabled', currentIndex === mgeorgeScenes.length - 1);
-                
+
                 // Back button returns to Main Road 7
                 mainroadButton.classList.add('show');
             }
         }
-        
+
         // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (currentCollection === 'mainroad' || currentCollection === 'bschool' || currentCollection === 'bschool1_sub' || currentCollection === 'mgeorge') {
                 if (e.key === 'ArrowDown') {
                     navigatePanorama(-1);
@@ -762,19 +780,19 @@ W<!DOCTYPE html>
                 }
             }
         });
-        
+
         // Initialize with first panorama
         initViewer('mainroad_1');
-        
+
         // Add event listeners for navigation arrows
-        document.getElementById('prev-arrow').addEventListener('click', function(e) {
+        document.getElementById('prev-arrow').addEventListener('click', function (e) {
             e.preventDefault();
             if (!this.classList.contains('disabled')) {
                 navigatePanorama(-1);
             }
         });
-        
-        document.getElementById('next-arrow').addEventListener('click', function(e) {
+
+        document.getElementById('next-arrow').addEventListener('click', function (e) {
             e.preventDefault();
             if (!this.classList.contains('disabled')) {
                 navigatePanorama(1);
@@ -782,4 +800,5 @@ W<!DOCTYPE html>
         });
     </script>
 </body>
+
 </html>
